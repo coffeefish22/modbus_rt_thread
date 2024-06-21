@@ -1,24 +1,3 @@
-/*
- * FreeModbus Libary: STM32 Port
- * Copyright (C) 2013 Armink <armink.ztl@gmail.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
- * File: $Id: porttimer_m.c,v 1.60 2013/08/13 15:07:05 Armink add Master Functions$
- */
-
 /* ----------------------- Platform includes --------------------------------*/
 #include "port.h"
 
@@ -41,59 +20,59 @@ static void prvvTIMERExpiredISR(void);
 BOOL xMBMasterPortTimersInit(USHORT usTimeOut50us)
 {
 	NVIC_InitTypeDef NVIC_InitStructure;
-	//====================================Ê±ÖÓ³õÊ¼»¯===========================
-	//Ê¹ÄÜ¶¨Ê±Æ÷2Ê±ÖÓ
+	//====================================æ—¶é’Ÿåˆå§‹åŒ–===========================
+	//ä½¿èƒ½å®šæ—¶å™¨2æ—¶é’Ÿ
 	#if USER_TIM_DEFAULT
 		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
 	#else
 		RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8,ENABLE);
 	#endif
 	
-	//====================================¶¨Ê±Æ÷³õÊ¼»¯===========================
-	//¶¨Ê±Æ÷Ê±¼ä»ùÅäÖÃËµÃ÷
-	//HCLKÎª72MHz£¬APB1¾­¹ı2·ÖÆµÎª36MHz
-	//TIM2µÄÊ±ÖÓ±¶ÆµºóÎª72MHz£¨Ó²¼ş×Ô¶¯±¶Æµ,´ïµ½×î´ó£©
-	//TIM2µÄ·ÖÆµÏµÊıÎª3599£¬Ê±¼ä»ùÆµÂÊÎª72 / (1 + Prescaler) = 20KHz,»ù×¼Îª50us
-	//TIM×î´ó¼ÆÊıÖµÎªusTim1Timerout50u	
+	//====================================å®šæ—¶å™¨åˆå§‹åŒ–===========================
+	//å®šæ—¶å™¨æ—¶é—´åŸºé…ç½®è¯´æ˜
+	//HCLKä¸º72MHzï¼ŒAPB1ç»è¿‡2åˆ†é¢‘ä¸º36MHz
+	//TIM2çš„æ—¶é’Ÿå€é¢‘åä¸º72MHzï¼ˆç¡¬ä»¶è‡ªåŠ¨å€é¢‘,è¾¾åˆ°æœ€å¤§ï¼‰
+	//TIM2çš„åˆ†é¢‘ç³»æ•°ä¸º3599ï¼Œæ—¶é—´åŸºé¢‘ç‡ä¸º72 / (1 + Prescaler) = 20KHz,åŸºå‡†ä¸º50us
+	//TIMæœ€å¤§è®¡æ•°å€¼ä¸ºusTim1Timerout50u	
 	usPrescalerValue = (uint16_t) (SystemCoreClock / 20000) - 1;
-	//±£´æT35¶¨Ê±Æ÷¼ÆÊıÖµ
+	//ä¿å­˜T35å®šæ—¶å™¨è®¡æ•°å€¼
 	usT35TimeOut50us = usTimeOut50us; 
 
 	#if 1
-	//Ô¤×°ÔØÊ¹ÄÜ
+	//é¢„è£…è½½ä½¿èƒ½
 	TIM_ARRPreloadConfig(TIM4, ENABLE);
-	//====================================ÖĞ¶Ï³õÊ¼»¯===========================
-	//ÉèÖÃNVICÓÅÏÈ¼¶·Ö×éÎªGroup2£º0-3ÇÀÕ¼Ê½ÓÅÏÈ¼¶£¬0-3µÄÏìÓ¦Ê½ÓÅÏÈ¼¶
+	//====================================ä¸­æ–­åˆå§‹åŒ–===========================
+	//è®¾ç½®NVICä¼˜å…ˆçº§åˆ†ç»„ä¸ºGroup2ï¼š0-3æŠ¢å å¼ä¼˜å…ˆçº§ï¼Œ0-3çš„å“åº”å¼ä¼˜å…ˆçº§
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
 	NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
-	//Çå³ıÒç³öÖĞ¶Ï±êÖ¾Î»
+	//æ¸…é™¤æº¢å‡ºä¸­æ–­æ ‡å¿—ä½
 	TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
-	//¶¨Ê±Æ÷3Òç³öÖĞ¶Ï¹Ø±Õ
+	//å®šæ—¶å™¨3æº¢å‡ºä¸­æ–­å…³é—­
 	TIM_ITConfig(TIM4, TIM_IT_Update, DISABLE);
-	//¶¨Ê±Æ÷3½ûÄÜ
+	//å®šæ—¶å™¨3ç¦èƒ½
 	TIM_Cmd(TIM4, DISABLE);
 	
 	#else
 	
-	//Ô¤×°ÔØÊ¹ÄÜ
+	//é¢„è£…è½½ä½¿èƒ½
 	TIM_ARRPreloadConfig(TIM8, ENABLE);
-	//====================================ÖĞ¶Ï³õÊ¼»¯===========================
-	//ÉèÖÃNVICÓÅÏÈ¼¶·Ö×éÎªGroup2£º0-3ÇÀÕ¼Ê½ÓÅÏÈ¼¶£¬0-3µÄÏìÓ¦Ê½ÓÅÏÈ¼¶
+	//====================================ä¸­æ–­åˆå§‹åŒ–===========================
+	//è®¾ç½®NVICä¼˜å…ˆçº§åˆ†ç»„ä¸ºGroup2ï¼š0-3æŠ¢å å¼ä¼˜å…ˆçº§ï¼Œ0-3çš„å“åº”å¼ä¼˜å…ˆçº§
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
 	NVIC_InitStructure.NVIC_IRQChannel = TIM8_UP_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
-	//Çå³ıÒç³öÖĞ¶Ï±êÖ¾Î»
+	//æ¸…é™¤æº¢å‡ºä¸­æ–­æ ‡å¿—ä½
 	TIM_ClearITPendingBit(TIM8, TIM_IT_Update);
-	//¶¨Ê±Æ÷3Òç³öÖĞ¶Ï¹Ø±Õ
+	//å®šæ—¶å™¨3æº¢å‡ºä¸­æ–­å…³é—­
 	TIM_ITConfig(TIM8, TIM_IT_Update, DISABLE);
-	//¶¨Ê±Æ÷3½ûÄÜ
+	//å®šæ—¶å™¨3ç¦èƒ½
 	TIM_Cmd(TIM8, DISABLE);
 
 	#endif
@@ -217,8 +196,8 @@ void TIM4_IRQHandler(void)
 	if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
 	{
 		
-		TIM_ClearFlag(TIM4, TIM_FLAG_Update);	     //ÇåÖĞ¶Ï±ê¼Ç
-		TIM_ClearITPendingBit(TIM4, TIM_IT_Update);	 //Çå³ı¶¨Ê±Æ÷TIM2Òç³öÖĞ¶Ï±êÖ¾Î»
+		TIM_ClearFlag(TIM4, TIM_FLAG_Update);	     //æ¸…ä¸­æ–­æ ‡è®°
+		TIM_ClearITPendingBit(TIM4, TIM_IT_Update);	 //æ¸…é™¤å®šæ—¶å™¨TIM2æº¢å‡ºä¸­æ–­æ ‡å¿—ä½
 		prvvTIMERExpiredISR();
 	}
 	rt_interrupt_leave();
@@ -232,8 +211,8 @@ void TIM8_UP_IRQHandler(void)
 	if (TIM_GetITStatus(TIM8, TIM_IT_Update) != RESET)
 	{
 		
-		TIM_ClearFlag(TIM8, TIM_FLAG_Update);	     //ÇåÖĞ¶Ï±ê¼Ç
-		TIM_ClearITPendingBit(TIM8, TIM_IT_Update);	 //Çå³ı¶¨Ê±Æ÷TIM2Òç³öÖĞ¶Ï±êÖ¾Î»
+		TIM_ClearFlag(TIM8, TIM_FLAG_Update);	     //æ¸…ä¸­æ–­æ ‡è®°
+		TIM_ClearITPendingBit(TIM8, TIM_IT_Update);	 //æ¸…é™¤å®šæ—¶å™¨TIM2æº¢å‡ºä¸­æ–­æ ‡å¿—ä½
 		prvvTIMERExpiredISR();
 	}
 //	rt_interrupt_leave();
