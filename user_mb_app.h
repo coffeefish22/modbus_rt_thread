@@ -1,5 +1,6 @@
 #ifndef	USER_APP
 #define USER_APP
+
 /* ----------------------- Modbus includes ----------------------------------*/
 #include "mb.h"
 #include "mb_m.h"
@@ -17,19 +18,19 @@
 #define S_REG_INPUT_NREGS             100
 #define S_REG_HOLDING_START           1
 #define S_REG_HOLDING_NREGS           200
-//�ӻ�ģʽ���ڱ��ּĴ����У�������ַ��Ӧ�Ĺ��ܶ���
-#define          S_HD_RESERVE                     0		  //����
-#define          S_HD_CPU_USAGE_MAJOR             1         //��ǰCPU�����ʵ�����λ
-#define          S_HD_CPU_USAGE_MINOR             2         //��ǰCPU�����ʵ�С��λ
+//从机模式：在保持寄存器中，各个地址对应的功能定义
+#define          S_HD_RESERVE                     0		  //保留
+#define          S_HD_CPU_USAGE_MAJOR             1         //当前CPU利用率的整数位
+#define          S_HD_CPU_USAGE_MINOR             2         //当前CPU利用率的小数位
 
-//�ӻ�ģʽ��������Ĵ����У�������ַ��Ӧ�Ĺ��ܶ���
-#define          S_IN_RESERVE                     0		  //����
+//从机模式：在输入寄存器中，各个地址对应的功能定义
+#define          S_IN_RESERVE                     0		  //保留
 
-//�ӻ�ģʽ������Ȧ�У�������ַ��Ӧ�Ĺ��ܶ���
-#define          S_CO_RESERVE                     2		  //����
+//从机模式：在线圈中，各个地址对应的功能定义
+#define          S_CO_RESERVE                     2		  //保留
 
-//�ӻ�ģʽ������ɢ�����У�������ַ��Ӧ�Ĺ��ܶ���
-#define          S_DI_RESERVE                     1		  //����
+//从机模式：在离散输入中，各个地址对应的功能定义
+#define          S_DI_RESERVE                     1		  //保留
 
 /* -----------------------Master Defines -------------------------------------*/
 #define M_DISCRETE_INPUT_START        1
@@ -40,17 +41,17 @@
 #define M_REG_INPUT_NREGS             100*2
 #define M_REG_HOLDING_START           1
 #define M_REG_HOLDING_NREGS           100*2
-//����ģʽ���ڱ��ּĴ����У�������ַ��Ӧ�Ĺ��ܶ���
-#define          M_HD_RESERVE                     0		  //����
+//主机模式：在保持寄存器中，各个地址对应的功能定义
+#define          M_HD_RESERVE                     0		  //保留
 
-//����ģʽ��������Ĵ����У�������ַ��Ӧ�Ĺ��ܶ���
-#define          M_IN_RESERVE                     0		  //����
+//主机模式：在输入寄存器中，各个地址对应的功能定义
+#define          M_IN_RESERVE                     0		  //保留
 
-//����ģʽ������Ȧ�У�������ַ��Ӧ�Ĺ��ܶ���
-#define          M_CO_RESERVE                     2		  //����
+//主机模式：在线圈中，各个地址对应的功能定义
+#define          M_CO_RESERVE                     2		  //保留
 
-//����ģʽ������ɢ�����У�������ַ��Ӧ�Ĺ��ܶ���
-#define          M_DI_RESERVE                     1		  //����
+//主机模式：在离散输入中，各个地址对应的功能定义
+#define          M_DI_RESERVE                     1		  //保留
 
      
 
