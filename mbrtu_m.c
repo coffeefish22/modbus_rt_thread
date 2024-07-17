@@ -1,4 +1,4 @@
-
+//rtu方式
 /* ----------------------- System includes ----------------------------------*/
 #include "stdlib.h"
 #include "string.h"
