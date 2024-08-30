@@ -1,31 +1,10 @@
-/*
- * FreeModbus Libary: STM32 Port
- * Copyright (C) 2013 Armink <armink.ztl@gmail.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
- * File: $Id: portserial_m.c,v 1.60 2013/08/13 15:07:05 Armink add Master Functions $
- */
-
 #include "port.h"
 
 /* ----------------------- Modbus includes ----------------------------------*/
 #include "mb.h"
 #include "mbport.h"
 
-//Èç¹ûÊÇ485×÷ÎªÖ÷ModbusÔòÒª½«´ËÎ»ÖÃ1
+//å¦‚æœæ˜¯485ä½œä¸ºä¸»Modbusåˆ™è¦å°†æ­¤ä½ç½®1
 #define RS485_FOR_MASTER_MODBUS 0
 
 #define SerialXForModbus	(1)
@@ -91,21 +70,21 @@ void vMBMasterPortClose(void)
 	USART_ITConfig(USARTX, USART_IT_TXE | USART_IT_RXNE, DISABLE);
 	USART_Cmd(USARTX, DISABLE);
 }
-//Ä¬ÈÏÒ»¸öÖ÷»ú ´®¿Ú2 ²¨ÌØÂÊ¿ÉÉèÖÃ  ÆæÅ¼¼ìÑé¿ÉÉèÖÃ
+//é»˜è®¤ä¸€ä¸ªä¸»æœº ä¸²å£2 æ³¢ç‰¹ç‡å¯è®¾ç½®  å¥‡å¶æ£€éªŒå¯è®¾ç½®
 BOOL xMBMasterPortSerialInit(UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits,
 		eMBParity eParity)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 	USART_InitTypeDef USART_InitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
-	//======================Ê±ÖÓ³õÊ¼»¯=======================================
+	//======================æ—¶é’Ÿåˆå§‹åŒ–=======================================
 	#if (SerialXForModbus ==2)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
 	#endif
 
 	#if (SerialXForModbus ==1)
-	  //Ê¹ÄÜUSART1£¬GPIOA
+	  //ä½¿èƒ½USART1ï¼ŒGPIOA
  	 RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA |RCC_APB2Periph_USART1, ENABLE);
 	#endif
 
@@ -116,7 +95,7 @@ BOOL xMBMasterPortSerialInit(UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits,
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
 	#endif
 	
-	//======================IO³õÊ¼»¯=======================================	
+	//======================IOåˆå§‹åŒ–=======================================	
 	//USART2_TX
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 
@@ -128,7 +107,7 @@ BOOL xMBMasterPortSerialInit(UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits,
 	//USART2_RX
 
 #if ENABLE_BJ
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;//Õë¶Ôadm287EÖØĞÂ¶¨ÒåÎªÄÚÖÃÉÏÀ­¼´Õı³£
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;//é’ˆå¯¹adm287Eé‡æ–°å®šä¹‰ä¸ºå†…ç½®ä¸Šæ‹‰å³æ­£å¸¸
 #else
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
 #endif
@@ -136,26 +115,26 @@ BOOL xMBMasterPortSerialInit(UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits,
 	GPIO_Init(GPIOX, &GPIO_InitStructure);
 	
 #if RS485_FOR_MASTER_MODBUS	
-	//ÅäÖÃ485·¢ËÍºÍ½ÓÊÕÄ£Ê½
-//    TODO   ÔİÊ±ÏÈĞ´B13 µÈÖ®ºó×éÍø²âÊÔÊ±ÔÙĞŞ¸Ä
+	//é…ç½®485å‘é€å’Œæ¥æ”¶æ¨¡å¼
+//    TODO   æš‚æ—¶å…ˆå†™B13 ç­‰ä¹‹åç»„ç½‘æµ‹è¯•æ—¶å†ä¿®æ”¹
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStructure.GPIO_Pin = PIN_RS485_COM;
 	GPIO_Init(GPIO_RS485_COM, &GPIO_InitStructure);
 #endif	
-	//======================´®¿Ú³õÊ¼»¯=======================================
+	//======================ä¸²å£åˆå§‹åŒ–=======================================
 	USART_InitStructure.USART_BaudRate = ulBaudRate;
-	//ÉèÖÃĞ£ÑéÄ£Ê½
+	//è®¾ç½®æ ¡éªŒæ¨¡å¼
 	switch (eParity)
 	{
-	case MB_PAR_NONE: //ÎŞĞ£Ñé
+	case MB_PAR_NONE: //æ— æ ¡éªŒ
 		USART_InitStructure.USART_Parity = USART_Parity_No;
 		USART_InitStructure.USART_WordLength = USART_WordLength_8b;
 		break;
-	case MB_PAR_ODD: //ÆæĞ£Ñé
+	case MB_PAR_ODD: //å¥‡æ ¡éªŒ
 		USART_InitStructure.USART_Parity = USART_Parity_Odd;
 		USART_InitStructure.USART_WordLength = USART_WordLength_9b;
 		break;
-	case MB_PAR_EVEN: //Å¼Ğ£Ñé
+	case MB_PAR_EVEN: //å¶æ ¡éªŒ
 		USART_InitStructure.USART_Parity = USART_Parity_Even;
 		USART_InitStructure.USART_WordLength = USART_WordLength_9b;
 		break;
@@ -174,12 +153,12 @@ BOOL xMBMasterPortSerialInit(UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits,
 	USART_ITConfig(USARTX, USART_IT_RXNE, ENABLE);
 	USART_Cmd(USARTX, ENABLE);
 
-	ENTER_CRITICAL_SECTION(); //¹ØÈ«¾ÖÖĞ¶Ï
+	ENTER_CRITICAL_SECTION(); //å…³å…¨å±€ä¸­æ–­
 
 
 
-	//=====================ÖĞ¶Ï³õÊ¼»¯======================================
-	//ÉèÖÃNVICÓÅÏÈ¼¶·Ö×éÎªGroup2£º0-3ÇÀÕ¼Ê½ÓÅÏÈ¼¶£¬0-3µÄÏìÓ¦Ê½ÓÅÏÈ¼¶
+	//=====================ä¸­æ–­åˆå§‹åŒ–======================================
+	//è®¾ç½®NVICä¼˜å…ˆçº§åˆ†ç»„ä¸ºGroup2ï¼š0-3æŠ¢å å¼ä¼˜å…ˆçº§ï¼Œ0-3çš„å“åº”å¼ä¼˜å…ˆçº§
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 #if (SerialXForModbus ==1)
 	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
@@ -196,14 +175,14 @@ BOOL xMBMasterPortSerialInit(UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits,
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 
-	EXIT_CRITICAL_SECTION(); //¿ªÈ«¾ÖÖĞ¶Ï
+	EXIT_CRITICAL_SECTION(); //å¼€å…¨å±€ä¸­æ–­
 
 	return TRUE;
 }
 
 BOOL xMBMasterPortSerialPutByte(CHAR ucByte)
 {
-//¿ØÖÆ·¢ËÍµÆÖ¸Ê¾.(heat3¼ÓÈÈµÄÖ¸Ê¾µÆ)
+//æ§åˆ¶å‘é€ç¯æŒ‡ç¤º.(heat3åŠ çƒ­çš„æŒ‡ç¤ºç¯)
 //	GPIO_ResetBits(GPIOA,GPIO_Pin_1);
 	USART_SendData(USARTX, ucByte);
 //	GPIO_SetBits(GPIOA,GPIO_Pin_1);
@@ -241,7 +220,7 @@ void prvvUARTRxISR(void)
 
 #if(SerialXForModbus ==1)
 /**
-  * @brief  USART1ÖĞ¶Ï·şÎñº¯Êı
+  * @brief  USART1ä¸­æ–­æœåŠ¡å‡½æ•°
   * @param  None
   * @retval None
   */
@@ -249,18 +228,18 @@ void USART1_IRQHandler(void)
 {
 
 	rt_interrupt_enter();
-		//´Ë¾äÊÇÇå³ıoverrunÒç³öÎ»£¬±ÜÃâ´®¿Ú½ÓÊÕÖĞ¶ÏËÀ»ú
+		//æ­¤å¥æ˜¯æ¸…é™¤overrunæº¢å‡ºä½ï¼Œé¿å…ä¸²å£æ¥æ”¶ä¸­æ–­æ­»æœº
 	if(USART_GetFlagStatus(USART1, USART_FLAG_ORE) != RESET)
 	{
 	   USART_ReceiveData(USART1);
 	} 
-	//½ÓÊÕÖĞ¶Ï
+	//æ¥æ”¶ä¸­æ–­
 	if (USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
 	{
 		USART_ClearITPendingBit(USART1, USART_IT_RXNE);
 		prvvUARTRxISR();
 	}
-	//·¢ËÍÖĞ¶Ï
+	//å‘é€ä¸­æ–­
 	if (USART_GetITStatus(USART1, USART_IT_TXE) == SET)
 	{
 		prvvUARTTxReadyISR();
@@ -283,13 +262,13 @@ void USART1_IRQHandler(void)
 void USART2_IRQHandler(void)
 {
 	rt_interrupt_enter();
-	//½ÓÊÕÖĞ¶Ï
+	//æ¥æ”¶ä¸­æ–­
 	if (USART_GetITStatus(USART2, USART_IT_RXNE) == SET)
 	{
 		USART_ClearITPendingBit(USART2, USART_IT_RXNE);
 		prvvUARTRxISR();
 	}
-	//·¢ËÍÖĞ¶Ï
+	//å‘é€ä¸­æ–­
 	if (USART_GetITStatus(USART2, USART_IT_TXE) == SET)
 	{
 		prvvUARTTxReadyISR();
@@ -309,13 +288,13 @@ void USART2_IRQHandler(void)
 void USART3_IRQHandler(void)
 {
 	rt_interrupt_enter();
-	//½ÓÊÕÖĞ¶Ï
+	//æ¥æ”¶ä¸­æ–­
 	if (USART_GetITStatus(USART3, USART_IT_RXNE) == SET)
 	{
 		USART_ClearITPendingBit(USART3, USART_IT_RXNE);
 		prvvUARTRxISR();
 	}
-	//·¢ËÍÖĞ¶Ï
+	//å‘é€ä¸­æ–­
 	if (USART_GetITStatus(USART3, USART_IT_TXE) == SET)
 	{
 		prvvUARTTxReadyISR();
